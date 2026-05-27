@@ -341,6 +341,20 @@ function updateCartCount() {
   }
 }
 
+function updateFavCount() {
+  const favCount = document.getElementById("fav-count");
+  if (favCount) {
+    const recentItems = RecentlyViewed.getItems();
+    favCount.textContent = recentItems.length;
+  }
+}
+
+function saveCart() {
+  if (cartManager) {
+    cartManager.saveToStorage();
+  }
+}
+
 // ===== My Orders Dashboard & Real-Time Tracking Engine =====
 
 function updateOrderStatuses() {

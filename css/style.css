@@ -244,6 +244,10 @@
       color: #fff;
       letter-spacing: 1px;
       user-select: none;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      gap: 0.4rem;
     }
     nav {
       display: flex;

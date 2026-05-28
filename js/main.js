@@ -792,10 +792,23 @@ window.checkout = async function () {
 
   const validationResult = await validateDeliveryLocation();
 
-  if (!validationResult.valid) {
-    alert(validationResult.error);
-    return false;
-  }
+ if (!validationResult.valid) {
+
+  // Save delivery failure info
+  localStorage.setItem(
+    "deliveryError",
+    JSON.stringify({
+      error: validationResult.error,
+      distance: validationResult.distance,
+      restaurantLocation: validationResult.restaurantLocation
+    })
+  );
+
+  // Still allow redirect to orders page
+  return {
+    deliveryAvailable: false
+  };
+}
 
   const subtotal = cart.reduce((sum, ci) => sum + ci.item.price * ci.quantity, 0);
   let discount = 0;
@@ -863,7 +876,9 @@ window.checkout = async function () {
   } else {
     console.warn('Delivery tracker is not ready yet. Order has been placed.');
   }
-  return true;
+  return {
+  deliveryAvailable: true
+};
 };
 
 window.reorderOrder = function (orderId) {
@@ -1330,14 +1345,17 @@ async function init() {
   setupDropdownFilterLinks();
 
   if (checkoutBtn) {
-    checkoutBtn.addEventListener("click", async (e) => {
-      e.preventDefault();
-      const success = await window.checkout();
-      if (success) {
-        window.location.href = "orders.html";
-      }
-    });
-  }
+  checkoutBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    const result = await window.checkout();
+
+    // Always open orders page
+    if (result) {
+      window.location.href = `orders.html?delivery=${result.deliveryAvailable}`;
+    }
+  });
+}
 
   // Load database items asynchronously without blocking UI interactions
   await loadMenuData();
